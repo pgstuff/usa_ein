@@ -1,0 +1,25 @@
+{
+    "name": "usa_ein",
+    "abstract": "USA EIN data type",
+    "description": "USA Employer Identification Number data type",
+    "version": "0.0.1",
+    "maintainer": "The maintainer's name",
+    "license": "postgresql",
+    "provides": {
+        "usa_ein": {
+            "abstract": "USA Employer Identification Number data type",
+            "file": "sql/usa_ein.sql",
+            "docfile": "doc/usa_ein.md",
+            "version": "0.0.1"
+        }
+    },
+    "release_status": "unstable",
+
+    "generated_by": "The maintainer's name",
+
+
+    "meta-spec": {
+        "version": "1.0.0",
+        "url": "http://pgxn.org/meta/spec.txt"
+    }
+}

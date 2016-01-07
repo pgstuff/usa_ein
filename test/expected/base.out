@@ -1,0 +1,175 @@
+\set ECHO none
+CREATE TABLE usa_eins(id serial primary key, usa_ein usa_ein unique);
+INSERT INTO usa_eins(usa_ein) VALUES('55-5555555');
+INSERT INTO usa_eins(usa_ein) VALUES('01-2345678');
+-- check for alternative input format
+INSERT INTO usa_eins(usa_ein) VALUES('999999999');
+-- check for invalid SSNs
+INSERT INTO usa_eins(usa_ein) VALUES('07-1111111');
+ERROR:  USA EIN number "07-1111111" is invalid.
+LINE 1: INSERT INTO usa_eins(usa_ein) VALUES('07-1111111');
+                                             ^
+INSERT INTO usa_eins(usa_ein) VALUES('012-345678');
+ERROR:  Invalid format of input data "012-345678".
+LINE 1: INSERT INTO usa_eins(usa_ein) VALUES('012-345678');
+                                             ^
+HINT:  Valid formats are: AA-BBBBBBB or AABBBBBBB
+INSERT INTO usa_eins(usa_ein) VALUES('01-2345678 ');
+ERROR:  Unexpected character ' ' in input data "01-2345678 ".
+LINE 1: INSERT INTO usa_eins(usa_ein) VALUES('01-2345678 ');
+                                             ^
+HINT:  Valid USA EIN consists of digits and optional dashes
+SELECT * FROM usa_eins ORDER BY usa_ein;
+ id |  usa_ein   
+----+------------
+  2 | 01-2345678
+  1 | 55-5555555
+  3 | 99-9999999
+(3 rows)
+
+SELECT id,usa_ein::text FROM usa_eins WHERE usa_ein = '55-5555555';
+ id |  usa_ein   
+----+------------
+  1 | 55-5555555
+(1 row)
+
+-- index scan
+TRUNCATE usa_eins;
+INSERT INTO usa_eins(usa_ein) SELECT '01-'||id FROM generate_series(1234500, 1234599) id;
+--INSERT INTO usa_eins(usa_ein) SELECT '01-'||id FROM generate_series(1000000, 9999999) id;
+SET enable_seqscan = false;
+SELECT id,usa_ein::text FROM usa_eins WHERE usa_ein = '01-1234567';
+ id |  usa_ein   
+----+------------
+ 71 | 01-1234567
+(1 row)
+
+SELECT id,usa_ein FROM usa_eins WHERE usa_ein >= '01-1234567' LIMIT 5;
+ id |  usa_ein   
+----+------------
+ 71 | 01-1234567
+ 72 | 01-1234568
+ 73 | 01-1234569
+ 74 | 01-1234570
+ 75 | 01-1234571
+(5 rows)
+
+SELECT count(id) FROM usa_eins;
+ count 
+-------
+   100
+(1 row)
+
+SELECT count(id) FROM usa_eins WHERE usa_ein <> ('01-1234567'::text)::usa_ein;
+ count 
+-------
+    99
+(1 row)
+
+RESET enable_seqscan;
+-- operators and conversions
+SELECT '01-1234567'::usa_ein < '01-1234567'::usa_ein;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '01-1234567'::usa_ein > '01-1234567'::usa_ein;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '01-1234567'::usa_ein < '01-1234568'::usa_ein;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '01-1234567'::usa_ein > '01-1234568'::usa_ein;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '01-1234567'::usa_ein <= '01-1234567'::usa_ein;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '01-1234567'::usa_ein >= '01-1234567'::usa_ein;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '01-1234567'::usa_ein <= '01-1234568'::usa_ein;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '01-1234567'::usa_ein >= '01-1234568'::usa_ein;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '01-1234567'::usa_ein <> '01-1234567'::usa_ein;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '01-1234567'::usa_ein <> '01-1234568'::usa_ein;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '01-1234567'::usa_ein = '01-1234567'::usa_ein;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '01-1234567'::usa_ein = '01-1234568'::usa_ein;
+ ?column? 
+----------
+ f
+(1 row)
+
+-- test limits
+SELECT '01-0000000'::usa_ein;
+  usa_ein   
+------------
+ 01-0000000
+(1 row)
+
+SELECT '99-0000000'::usa_ein;
+  usa_ein   
+------------
+ 99-0000000
+(1 row)
+
+SELECT '01-9999999'::usa_ein;
+  usa_ein   
+------------
+ 01-9999999
+(1 row)
+
+SELECT '99-9999999'::usa_ein;
+  usa_ein   
+------------
+ 99-9999999
+(1 row)
+
+-- COPY FROM/TO
+TRUNCATE usa_eins;
+COPY usa_eins(usa_ein) FROM STDIN;
+COPY usa_eins TO STDOUT;
+104	55-5555555
+105	99-9999999
+-- clean up --
+DROP TABLE usa_eins;

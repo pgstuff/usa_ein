@@ -1,0 +1,4 @@
+# usa_ein extension
+comment = 'USA Employer Identification Number data type'
+default_version = '0.0.1'
+relocatable = false
