@@ -19,7 +19,7 @@ typedef uint32 usa_ein_t;
 Datum usa_ein_in(PG_FUNCTION_ARGS);
 Datum usa_ein_out(PG_FUNCTION_ARGS);
 Datum usa_ein_to_text(PG_FUNCTION_ARGS);
-Datum text_to_usa_ein(PG_FUNCTION_ARGS);
+Datum usa_ein_from_text(PG_FUNCTION_ARGS);
 Datum usa_ein_send(PG_FUNCTION_ARGS);
 Datum usa_ein_recv(PG_FUNCTION_ARGS);
 Datum usa_ein_lt(PG_FUNCTION_ARGS);
@@ -78,9 +78,9 @@ usa_ein_to_text(PG_FUNCTION_ARGS)
 	PG_RETURN_TEXT_P(usa_ein_text);
 }
 
-PG_FUNCTION_INFO_V1(text_to_usa_ein);
+PG_FUNCTION_INFO_V1(usa_ein_from_text);
 Datum
-text_to_usa_ein(PG_FUNCTION_ARGS)
+usa_ein_from_text(PG_FUNCTION_ARGS)
 {
 	text  *usa_ein_text = PG_GETARG_TEXT_P(0);
 	char  *usa_ein_str = DatumGetCString(DirectFunctionCall1(textout, PointerGetDatum(usa_ein_text)));

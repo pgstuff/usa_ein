@@ -47,7 +47,7 @@ LANGUAGE C IMMUTABLE STRICT;
 -- to/from text conversion
 CREATE OR REPLACE FUNCTION usa_ein_to_text(usa_ein) RETURNS text AS '$libdir/usa_ein'
 LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION text_to_usa_ein(text) RETURNS usa_ein AS '$libdir/usa_ein'
+CREATE OR REPLACE FUNCTION usa_ein_from_text(text) RETURNS usa_ein AS '$libdir/usa_ein'
 LANGUAGE C IMMUTABLE STRICT;
 
 -- operators
@@ -116,7 +116,7 @@ CREATE OPERATOR CLASS usa_ein_ops DEFAULT FOR TYPE usa_ein USING btree AS
 	FUNCTION 1 usa_ein_cmp(usa_ein, usa_ein);
 -- cast from/to text
 CREATE CAST (usa_ein AS text) WITH FUNCTION usa_ein_to_text(usa_ein) AS ASSIGNMENT;
-CREATE CAST (text AS usa_ein) WITH FUNCTION text_to_usa_ein(text) AS ASSIGNMENT;
+CREATE CAST (text AS usa_ein) WITH FUNCTION usa_ein_from_text(text) AS ASSIGNMENT;
 
 /* Does this survive a pg_dump?
 CREATE CAST (int       AS usa_ein)   WITHOUT FUNCTION AS ASSIGNMENT;
